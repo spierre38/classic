@@ -20,7 +20,44 @@ body{
   background:rgba(255,244,224,0.5);
   animation:twinkle ease-in-out infinite alternate;
 }
-@keyframes twinkle{0%{opacity:0.08}100%{opacity:0.5}}
+@keyframes twinkle{0%{opacity:0.12}100%{opacity:0.75}}
+
+.moon{
+  position:fixed;top:8%;right:12%;
+  width:74px;height:74px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,#fdfbf3 0%,#f4ecd8 45%,#e8dcc0 100%);
+  box-shadow:0 0 3px 1px rgba(255,250,235,0.5),
+             0 0 40px 12px rgba(255,245,220,0.10),
+             0 0 90px 30px rgba(255,240,210,0.06);
+  z-index:1;pointer-events:none;
+  animation:moonGlow 6s ease-in-out infinite alternate;
+}
+.moon::before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 62% 40%,transparent 60%,rgba(210,198,170,0.35) 61%,transparent 66%),
+             radial-gradient(circle at 40% 62%,transparent 72%,rgba(210,198,170,0.3) 73%,transparent 77%),
+             radial-gradient(circle at 55% 55%,transparent 82%,rgba(205,192,164,0.25) 83%,transparent 86%);
+}
+@keyframes moonGlow{
+  0%{box-shadow:0 0 3px 1px rgba(255,250,235,0.45),0 0 36px 10px rgba(255,245,220,0.08),0 0 80px 26px rgba(255,240,210,0.05)}
+  100%{box-shadow:0 0 4px 1px rgba(255,250,235,0.6),0 0 48px 14px rgba(255,245,220,0.13),0 0 100px 34px rgba(255,240,210,0.08)}
+}
+
+.shooting{
+  position:fixed;width:2px;height:2px;border-radius:50%;
+  background:#fff;z-index:2;pointer-events:none;opacity:0;
+  box-shadow:0 0 4px 1px rgba(255,255,255,0.8);
+}
+.shooting::after{
+  content:"";position:absolute;top:50%;right:0;
+  width:90px;height:1px;transform:translateY(-50%);
+  background:linear-gradient(to left,rgba(255,255,255,0.7),transparent);
+}
+@keyframes shoot{
+  0%{opacity:0;transform:translate(0,0) rotate(var(--ang))}
+  8%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--ang))}
+}
 
 .scene{
   position:relative;
@@ -195,7 +232,7 @@ body.garden-mode .tap-hint{opacity:0;pointer-events:none;animation:none}
 @media (prefers-reduced-motion: reduce){
   .stem{stroke-dashoffset:0;animation:none}
   .leaf,.petal,.petal-inner,.stamen,.pistil,.message{opacity:1;animation:none;transform:none}
-  .glow,.star,.grass-back,.grass-front{animation:none}
+  .glow,.star,.grass-back,.grass-front,.moon{animation:none}
   .mini svg{animation:none}
   body.garden-mode .mini{animation:none;opacity:1;transform:none}
 }
@@ -204,6 +241,7 @@ body.garden-mode .tap-hint{opacity:0;pointer-events:none;animation:none}
 <body>
 
 <div class="vignette"></div>
+<div class="moon"></div>
 <div class="stars" id="stars"></div>
 <canvas id="fx"></canvas>
 
@@ -278,17 +316,41 @@ var MILESTONES=[
 
   /* ---- background stars ---- */
   var stars=document.getElementById('stars');
-  for(var i=0;i<46;i++){
+  for(var i=0;i<90;i++){
     var s=document.createElement('div');
     s.className='star';
-    var sz=(0.5+Math.random()*1.6);
+    var sz=(0.6+Math.random()*2);
     s.style.width=s.style.height=sz+'px';
     s.style.left=Math.random()*100+'%';
-    s.style.top=Math.random()*62+'%';
+    s.style.top=Math.random()*64+'%';
+    if(Math.random()<0.3){s.style.boxShadow='0 0 '+(2+Math.random()*3)+'px rgba(255,248,230,0.7)'}
     s.style.animationDuration=(2+Math.random()*4)+'s';
     s.style.animationDelay=(Math.random()*4)+'s';
     stars.appendChild(s);
   }
+
+  /* ---- shooting stars ---- */
+  function shootingStar(){
+    if(reduced)return;
+    var sh=document.createElement('div');
+    sh.className='shooting';
+    var startX=10+Math.random()*70;
+    var startY=Math.random()*32;
+    sh.style.left=startX+'vw';
+    sh.style.top=startY+'vh';
+    var dist=180+Math.random()*160;
+    var down=0.45+Math.random()*0.3;
+    sh.style.setProperty('--dx',dist+'px');
+    sh.style.setProperty('--dy',(dist*down)+'px');
+    sh.style.setProperty('--ang',(Math.atan2(down,1)*180/Math.PI)+'deg');
+    sh.style.animation='shoot '+(0.9+Math.random()*0.5)+'s ease-in forwards';
+    document.body.appendChild(sh);
+    setTimeout(function(){sh.remove()},1600);
+  }
+  function scheduleShoot(){
+    setTimeout(function(){shootingStar();scheduleShoot()},4000+Math.random()*7000);
+  }
+  scheduleShoot();
 
   /* ---- soft golden bursts ---- */
   var cv=document.getElementById('fx'),ctx=cv.getContext&&cv.getContext('2d'),parts=[],running=false;
