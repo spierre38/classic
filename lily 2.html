@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  background:radial-gradient(ellipse at 50% 30%,#141210 0%,#0a0a0a 60%,#060606 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;
+  position:relative;
+}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:1}
+.star{
+  position:absolute;border-radius:50%;
+  background:rgba(255,244,224,0.5);
+  animation:twinkle ease-in-out infinite alternate;
+}
+@keyframes twinkle{0%{opacity:0.08}100%{opacity:0.5}}
+
+.scene{
+  position:relative;
+  width:100vmin;height:100vmin;
+  max-width:480px;max-height:480px;
+  z-index:6;
+  transition:opacity 1.4s ease,transform 1.4s cubic-bezier(0.4,0,0.2,1);
+}
+body.garden-mode .scene{opacity:0;transform:translateY(-6%) scale(0.92);pointer-events:none}
+.glow{
+  position:absolute;width:300px;height:300px;top:50%;left:50%;
+  transform:translate(-50%,-60%);
+  background:radial-gradient(ellipse,rgba(255,235,210,0.08) 0%,rgba(255,235,210,0.03) 40%,transparent 70%);
+  border-radius:50%;
+  animation:glowPulse 4s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes glowPulse{
+  0%{opacity:0.6;transform:translate(-50%,-60%) scale(1)}
+  100%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}
+}
+svg.lily{width:100%;height:100%;filter:drop-shadow(0 0 40px rgba(255,240,220,0.06));overflow:visible}
+.stem{
+  stroke-width:3;fill:none;stroke-linecap:round;
+  stroke-dasharray:300;stroke-dashoffset:300;
+  animation:drawStem 2s ease-out 0.3s forwards;
+}
+@keyframes drawStem{to{stroke-dashoffset:0}}
+.leaf{opacity:0;transform-box:fill-box;animation:leafGrow 1.2s ease-out forwards}
+.leaf-1{animation-delay:1.5s;transform-origin:100% 50%}
+.leaf-2{animation-delay:1.8s;transform-origin:0% 50%}
+@keyframes leafGrow{
+  0%{opacity:0;transform:scale(0.2)}
+  60%{opacity:0.85;transform:scale(1.05)}
+  100%{opacity:0.8;transform:scale(1)}
+}
+.petal,.petal-inner{
+  opacity:0;transform-box:fill-box;transform-origin:50% 100%;
+  animation:bloom 2.2s cubic-bezier(0.34,1.2,0.64,1) forwards;
+}
+.p1{animation-delay:2.2s}.p2{animation-delay:2.5s}.p3{animation-delay:2.8s}
+.p4{animation-delay:3.2s}.p5{animation-delay:3.5s}.p6{animation-delay:3.8s}
+@keyframes bloom{
+  0%{opacity:0;transform:scale(0.3,0.08)}
+  35%{opacity:0.95}
+  100%{opacity:1;transform:scale(1,1)}
+}
+.stamen,.pistil{
+  opacity:0;transform-box:fill-box;transform-origin:50% 100%;
+  animation:stamenGrow 1.2s ease-out forwards;
+}
+.s1{animation-delay:4.2s}.s2{animation-delay:4.4s}.s3{animation-delay:4.6s}
+.s4{animation-delay:4.5s}.s5{animation-delay:4.7s}
+.pistil{animation-delay:4.3s}
+@keyframes stamenGrow{
+  0%{opacity:0;transform:scaleY(0)}
+  100%{opacity:0.9;transform:scaleY(1)}
+}
+.message{
+  position:absolute;bottom:-70px;left:50%;
+  transform:translateX(-50%);
+  text-align:center;opacity:0;
+  animation:fadeMessage 3s ease-in 5.5s forwards;
+  white-space:nowrap;
+}
+.message p{
+  color:rgba(255,245,235,0.85);
+  font-size:clamp(16px,4vmin,22px);
+  font-weight:300;letter-spacing:0.08em;
+  font-style:italic;line-height:1.6;
+}
+@keyframes fadeMessage{
+  0%{opacity:0;transform:translateX(-50%) translateY(10px)}
+  100%{opacity:1;transform:translateX(-50%) translateY(0)}
+}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:4}
+.vignette{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.6) 100%);
+  pointer-events:none;z-index:12;
+}
+
+/* ---------- night meadow ---------- */
+#field{
+  position:fixed;left:0;right:0;bottom:0;
+  height:42vh;min-height:250px;
+  opacity:0;pointer-events:none;
+  transition:opacity 1.6s ease 0.6s;
+  z-index:7;
+}
+body.garden-mode #field{opacity:1;pointer-events:auto}
+.ground{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 0%,rgba(14,22,9,0.5) 35%,#0d1408 70%,#0a1006 100%);
+}
+.horizon{
+  position:absolute;left:0;right:0;top:-8%;height:45%;
+  background:radial-gradient(ellipse at 50% 100%,rgba(210,225,180,0.05) 0%,transparent 65%);
+  pointer-events:none;
+}
+.grass{
+  position:absolute;left:-2%;right:-2%;bottom:0;
+  width:104%;
+  transform-origin:50% 100%;
+}
+.grass svg{display:block;width:100%}
+.grass-back{height:30%;animation:swayA 7s ease-in-out infinite alternate;z-index:1}
+.grass-front{height:44%;animation:swayB 5.5s ease-in-out infinite alternate;z-index:3;pointer-events:none}
+@keyframes swayA{0%{transform:skewX(-0.8deg)}100%{transform:skewX(0.9deg)}}
+@keyframes swayB{0%{transform:skewX(1deg)}100%{transform:skewX(-1.1deg)}}
+
+#garden{
+  position:absolute;left:0;right:0;bottom:6%;
+  display:flex;align-items:flex-end;justify-content:center;
+  gap:clamp(20px,7vw,60px);
+  padding:0 6vw;
+  z-index:2;
+}
+.mini{
+  position:relative;cursor:pointer;
+  opacity:0;
+  transition:filter 0.4s;
+}
+body.garden-mode .mini{animation:miniIn 1.3s cubic-bezier(0.34,1.3,0.64,1) forwards}
+@keyframes miniIn{
+  0%{opacity:0;transform:translateY(34px) scale(0.5)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.mini svg{
+  display:block;overflow:visible;
+  transform-origin:50% 100%;
+  animation:flowerSway ease-in-out infinite alternate;
+}
+@keyframes flowerSway{
+  0%{transform:rotate(-1.6deg)}
+  100%{transform:rotate(1.6deg)}
+}
+.mini:hover svg{filter:brightness(1.18)}
+.mini.active{filter:brightness(1.25) drop-shadow(0 0 16px rgba(255,235,200,0.4))}
+
+#card{
+  position:fixed;left:50%;bottom:calc(42vh + 14px);
+  transform:translateX(-50%) translateY(12px);
+  max-width:min(420px,86vw);
+  background:rgba(16,14,12,0.92);
+  border:1px solid rgba(255,240,220,0.12);
+  border-radius:14px;
+  padding:18px 24px 20px;
+  text-align:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.45s ease,transform 0.45s ease;
+  z-index:15;
+  backdrop-filter:blur(6px);
+}
+#card.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#card h2{color:rgba(255,246,236,0.95);font-weight:400;font-size:19px;letter-spacing:0.06em;font-style:italic}
+#card time{display:block;color:rgba(255,235,205,0.45);font-size:12.5px;letter-spacing:0.18em;margin:5px 0 9px}
+#card p{color:rgba(255,245,235,0.75);font-size:15.5px;font-weight:300;line-height:1.65;letter-spacing:0.03em}
+
+.tap-hint{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%);
+  color:rgba(255,245,235,0.3);
+  font-size:13px;letter-spacing:0.15em;font-style:italic;
+  opacity:0;transition:opacity 0.8s;
+  z-index:20;cursor:pointer;
+}
+.tap-hint.show{opacity:1;animation:hintBreathe 2.5s ease-in-out infinite alternate}
+@keyframes hintBreathe{0%{opacity:0.25}100%{opacity:0.55}}
+body.garden-mode .tap-hint{opacity:0;pointer-events:none;animation:none}
+
+@media (prefers-reduced-motion: reduce){
+  .stem{stroke-dashoffset:0;animation:none}
+  .leaf,.petal,.petal-inner,.stamen,.pistil,.message{opacity:1;animation:none;transform:none}
+  .glow,.star,.grass-back,.grass-front{animation:none}
+  .mini svg{animation:none}
+  body.garden-mode .mini{animation:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="vignette"></div>
+<div class="stars" id="stars"></div>
+<canvas id="fx"></canvas>
+
+<div class="scene">
+  <div class="glow"></div>
+  <svg class="lily" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="petalGrad" x1="0%" y1="100%" x2="30%" y2="0%">
+        <stop offset="0%" stop-color="#e8cfc0"/>
+        <stop offset="30%" stop-color="#f0e2d6"/>
+        <stop offset="70%" stop-color="#f7efe6"/>
+        <stop offset="100%" stop-color="#fff8f0"/>
+      </linearGradient>
+      <linearGradient id="petalGradInner" x1="0%" y1="100%" x2="20%" y2="0%">
+        <stop offset="0%" stop-color="#eed8c8"/>
+        <stop offset="60%" stop-color="#f5eadd"/>
+        <stop offset="100%" stop-color="#fff5ec"/>
+      </linearGradient>
+      <linearGradient id="stemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#4a7a3a"/>
+        <stop offset="100%" stop-color="#2a4a1a"/>
+      </linearGradient>
+    </defs>
+    <path class="stem" d="M150 340 Q148 280 150 240 Q152 200 150 170" stroke="url(#stemGrad)"/>
+    <path class="leaf leaf-1" d="M150 280 Q118 262 102 238 Q112 256 128 268 Q139 276 150 280Z" fill="#3a6a2a"/>
+    <path class="leaf leaf-2" d="M150 300 Q182 284 200 264 Q186 280 170 291 Q160 297 150 300Z" fill="#3a6a2a"/>
+    <g transform="translate(150,172)">
+      <g transform="rotate(-45)"><path class="petal p1" fill="url(#petalGrad)" stroke="rgba(220,200,190,0.15)" stroke-width="0.3" d="M0 0 Q-14 -35 -18 -72 Q-19 -95 -8 -104 Q3 -108 10 -98 Q14 -82 9 -52 Q4 -26 0 0Z"/></g>
+      <g transform="rotate(45)"><path class="petal p2" fill="url(#petalGrad)" stroke="rgba(220,200,190,0.15)" stroke-width="0.3" d="M0 0 Q14 -35 18 -72 Q19 -95 8 -104 Q-3 -108 -10 -98 Q-14 -82 -9 -52 Q-4 -26 0 0Z"/></g>
+      <g><path class="petal p3" fill="url(#petalGrad)" stroke="rgba(220,200,190,0.15)" stroke-width="0.3" d="M0 0 Q-8 -40 -6 -80 Q-4 -102 6 -110 Q15 -112 18 -100 Q19 -80 12 -50 Q6 -25 0 0Z"/></g>
+      <g transform="rotate(-22)"><path class="petal-inner p4" fill="url(#petalGradInner)" stroke="rgba(220,200,190,0.1)" stroke-width="0.2" d="M0 0 Q-11 -30 -15 -62 Q-16 -82 -7 -89 Q2 -92 8 -83 Q11 -70 7 -44 Q3 -22 0 0Z"/></g>
+      <g transform="rotate(22)"><path class="petal-inner p5" fill="url(#petalGradInner)" stroke="rgba(220,200,190,0.1)" stroke-width="0.2" d="M0 0 Q11 -30 15 -62 Q16 -82 7 -89 Q-2 -92 -8 -83 Q-11 -70 -7 -44 Q-3 -22 0 0Z"/></g>
+      <g><path class="petal-inner p6" fill="url(#petalGradInner)" stroke="rgba(220,200,190,0.1)" stroke-width="0.2" d="M0 0 Q-4 -32 -1 -64 Q1 -80 8 -87 Q15 -89 17 -79 Q16 -64 10 -42 Q5 -21 0 0Z"/></g>
+    </g>
+    <g transform="translate(150,172)">
+      <g class="stamen s1"><line x1="-2" y1="0" x2="-14" y2="-55" stroke="#8a7a50" stroke-width="1" stroke-linecap="round"/><ellipse cx="-15" cy="-57" rx="3" ry="5" fill="#c4944a" transform="rotate(-15,-15,-57)"/></g>
+      <g class="stamen s2"><line x1="2" y1="0" x2="14" y2="-52" stroke="#8a7a50" stroke-width="1" stroke-linecap="round"/><ellipse cx="15" cy="-54" rx="3" ry="5" fill="#c4944a" transform="rotate(15,15,-54)"/></g>
+      <g class="stamen s3"><line x1="0" y1="0" x2="-6" y2="-58" stroke="#8a7a50" stroke-width="1" stroke-linecap="round"/><ellipse cx="-6" cy="-60" rx="2.5" ry="4.5" fill="#c4944a"/></g>
+      <g class="stamen s4"><line x1="0" y1="0" x2="8" y2="-56" stroke="#8a7a50" stroke-width="1" stroke-linecap="round"/><ellipse cx="9" cy="-58" rx="2.5" ry="4.5" fill="#c4944a" transform="rotate(10,9,-58)"/></g>
+      <g class="stamen s5"><line x1="0" y1="0" x2="0" y2="-60" stroke="#8a7a50" stroke-width="1" stroke-linecap="round"/><ellipse cx="0" cy="-62" rx="2.5" ry="4.5" fill="#c4944a"/></g>
+      <g class="pistil"><line x1="0" y1="0" x2="2" y2="-65" stroke="#6a8a4a" stroke-width="1.5" stroke-linecap="round"/><circle cx="2" cy="-67" r="3" fill="#7a9a5a"/></g>
+    </g>
+  </svg>
+  <div class="message"><p>i made this grow for you</p></div>
+</div>
+
+<div id="field">
+  <div class="horizon"></div>
+  <div class="ground"></div>
+  <div class="grass grass-back" id="grassBack"></div>
+  <div id="garden"></div>
+  <div class="grass grass-front" id="grassFront"></div>
+</div>
+
+<div id="card"><h2></h2><time></time><p></p></div>
+<div class="tap-hint" id="hint">tap to walk through our garden</div>
+
+<script>
+/* ============================================
+   EDIT YOUR MILESTONES HERE
+   Each one becomes a lily planted in the field.
+   Add a new object each time something matters.
+   ============================================ */
+var MILESTONES=[
+  {title:"the first hello",date:"edit this date",text:"write what happened here. where you were, what you noticed first, why it stuck."},
+  {title:"first visit",date:"edit this date",text:"the first time the distance closed. write the detail only you two would remember."},
+  {title:"the garden begins",date:"today",text:"this page. because some things deserve to keep growing."}
+];
+
+(function(){
+  var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- background stars ---- */
+  var stars=document.getElementById('stars');
+  for(var i=0;i<46;i++){
+    var s=document.createElement('div');
+    s.className='star';
+    var sz=(0.5+Math.random()*1.6);
+    s.style.width=s.style.height=sz+'px';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*62+'%';
+    s.style.animationDuration=(2+Math.random()*4)+'s';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    stars.appendChild(s);
+  }
+
+  /* ---- soft golden bursts ---- */
+  var cv=document.getElementById('fx'),ctx=cv.getContext&&cv.getContext('2d'),parts=[],running=false;
+  function size(){if(!ctx)return;var d=window.devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0)}
+  size();addEventListener('resize',size);
+  function burst(x,y){
+    if(!ctx)return;
+    var n=26+Math.floor(Math.random()*10);
+    for(var i=0;i<n;i++){
+      var a=Math.PI*2*i/n+Math.random()*0.2,sp=0.6+Math.random()*1.5;
+      parts.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.008+Math.random()*0.008,r:0.8+Math.random()*1.4,hue:38+Math.random()*18});
+    }
+    if(!running){running=true;requestAnimationFrame(tick)}
+  }
+  function tick(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    parts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;p.vy+=0.012;p.vx*=0.985;p.vy*=0.985;p.life-=p.decay;
+    });
+    parts=parts.filter(function(p){return p.life>0});
+    parts.forEach(function(p){
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,Math.max(0.01,p.r*p.life),0,Math.PI*2);
+      ctx.fillStyle='hsla('+p.hue+',75%,78%,'+(p.life*0.55)+')';
+      ctx.fill();
+    });
+    if(parts.length){requestAnimationFrame(tick)}else{running=false;ctx.clearRect(0,0,innerWidth,innerHeight)}
+  }
+  if(!reduced){
+    setTimeout(function(){burst(innerWidth*0.28,innerHeight*0.26)},6600);
+    setTimeout(function(){burst(innerWidth*0.72,innerHeight*0.2)},7300);
+    setTimeout(function(){burst(innerWidth*0.5,innerHeight*0.32)},8100);
+  }
+
+  /* ---- grass field ---- */
+  function makeGrass(count,hMin,hMax,palette){
+    var blades='';
+    for(var i=0;i<count;i++){
+      var x=Math.random()*1000;
+      var h=hMin+Math.random()*(hMax-hMin);
+      var bend=(Math.random()-0.5)*26;
+      var col=palette[Math.floor(Math.random()*palette.length)];
+      blades+='<path d="M'+x.toFixed(1)+' 150 Q'+(x+bend*0.35).toFixed(1)+' '+(150-h*0.6).toFixed(1)+' '+(x+bend).toFixed(1)+' '+(150-h).toFixed(1)+
+        ' Q'+(x+bend*0.55+1.6).toFixed(1)+' '+(150-h*0.5).toFixed(1)+' '+(x+3.2).toFixed(1)+' 150 Z" fill="'+col+'"/>';
+    }
+    return '<svg viewBox="0 0 1000 150" preserveAspectRatio="none" style="width:100%;height:100%">'+blades+'</svg>';
+  }
+  document.getElementById('grassBack').innerHTML=makeGrass(170,45,105,['#131f0c','#16240e','#1a2a11','#122009']);
+  document.getElementById('grassFront').innerHTML=makeGrass(150,55,135,['#1c3012','#203616','#243c19','#1a2d10']);
+
+  /* ---- milestone lilies ---- */
+  function miniLily(idx){
+    var h=64+((idx*19)%30);
+    var sway=(idx%2?1:-1)*(2+(idx%3));
+    return '<svg width="50" height="'+(h+36)+'" viewBox="0 0 50 '+(h+36)+'">'+
+      '<path d="M25 '+(h+32)+' Q'+(25+sway)+' '+(h/2+20)+' 25 27" stroke="#35592a" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+      '<path d="M25 '+(h+6)+' q-11 -5 -16 -13 q7 7 16 13Z" fill="#2c4a1e" opacity="0.9"/>'+
+      '<g transform="translate(25,27)">'+
+        '<ellipse rx="4.8" ry="14" transform="rotate(-42) translate(0,-10.5)" fill="#f3e8dc"/>'+
+        '<ellipse rx="4.8" ry="14" transform="rotate(42) translate(0,-10.5)" fill="#f3e8dc"/>'+
+        '<ellipse rx="4.8" ry="15" transform="translate(0,-11.5)" fill="#fbf3ea"/>'+
+        '<ellipse rx="4.2" ry="11.5" transform="rotate(-19) translate(0,-8.5)" fill="#efe0d2"/>'+
+        '<ellipse rx="4.2" ry="11.5" transform="rotate(19) translate(0,-8.5)" fill="#efe0d2"/>'+
+        '<circle r="2.8" cy="-4" fill="#c9994f"/>'+
+      '</g></svg>';
+  }
+  var garden=document.getElementById('garden');
+  var card=document.getElementById('card');
+  MILESTONES.forEach(function(m,i){
+    var d=document.createElement('div');
+    d.className='mini';
+    d.style.animationDelay=(0.8+i*0.3)+'s';
+    d.innerHTML=miniLily(i);
+    var sv=d.querySelector('svg');
+    sv.style.animationDuration=(3.8+Math.random()*2.4)+'s';
+    sv.style.animationDelay=(Math.random()*2)+'s';
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      var was=d.classList.contains('active');
+      document.querySelectorAll('.mini').forEach(function(x){x.classList.remove('active')});
+      if(was){card.classList.remove('show');return}
+      d.classList.add('active');
+      card.querySelector('h2').textContent=m.title;
+      card.querySelector('time').textContent=m.date;
+      card.querySelector('p').textContent=m.text;
+      card.classList.add('show');
+    });
+    garden.appendChild(d);
+  });
+
+  /* ---- flow ---- */
+  var hint=document.getElementById('hint');
+  setTimeout(function(){hint.classList.add('show')},reduced?800:9200);
+  function enterGarden(){
+    if(document.body.classList.contains('garden-mode'))return;
+    document.body.classList.add('garden-mode');
+    document.removeEventListener('click',enterGarden);
+    document.addEventListener('click',function(){
+      card.classList.remove('show');
+      document.querySelectorAll('.mini').forEach(function(x){x.classList.remove('active')});
+    });
+  }
+  setTimeout(function(){document.addEventListener('click',enterGarden)},reduced?400:6000);
+})();
+</script>
+</body>
+</html>
